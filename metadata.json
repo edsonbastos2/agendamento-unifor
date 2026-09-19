@@ -1,0 +1,6 @@
+{
+  "name": "Sistema de Agendamento de Barbearia",
+  "description": "Sistema completo de agendamento de barbearia com consulta de disponibilidade em tempo real, gestão multi-ator (Cliente, Recepcionista, Barbeiro, Administrador) e controle de ciclo de vida dos atendimentos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
