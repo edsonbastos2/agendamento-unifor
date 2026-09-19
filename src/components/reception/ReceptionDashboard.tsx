@@ -17,7 +17,8 @@ import {
   Banknote,
   QrCode,
   Users,
-  Timer
+  Timer,
+  Lock
 } from 'lucide-react';
 
 interface ReceptionDashboardProps {
@@ -52,6 +53,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
   const [paymentModalApt, setPaymentModalApt] = useState<Appointment | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('PIX');
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
+  const [cashGiven, setCashGiven] = useState<string>('');
 
   // Cancel Modal State (RF-10)
   const [cancelModalApt, setCancelModalApt] = useState<Appointment | null>(null);
@@ -94,12 +96,16 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
     setPaymentModalApt(apt);
     setPaymentAmount(s?.price || 0);
     setPaymentMethod('PIX');
+    setCashGiven('');
   };
 
   const handleConfirmPayment = () => {
     if (!paymentModalApt) return;
-    registerPayment(paymentModalApt.id, paymentMethod, paymentAmount);
+    const s = services.find((srv) => srv.id === paymentModalApt.serviceId);
+    const servicePrice = s?.price ?? paymentAmount;
+    registerPayment(paymentModalApt.id, paymentMethod, servicePrice);
     setPaymentModalApt(null);
+    setCashGiven('');
   };
 
   const handleConfirmCancel = () => {
@@ -433,67 +439,136 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
             </div>
 
             <p className="text-xs text-stone-400">
-              O barbeiro concluiu o atendimento. Registre a forma de pagamento informada pelo cliente.
+              O atendimento foi concluído. Registre a forma de pagamento informada pelo cliente.
             </p>
 
-            <div className="my-4 p-3 bg-stone-950 rounded-xl border border-stone-800 space-y-1.5 text-xs">
-              <p>
-                <strong className="text-stone-400">Cliente:</strong> {paymentModalApt.clientName}
-              </p>
-              <p>
-                <strong className="text-stone-400">Serviço Realizado:</strong>{' '}
-                {services.find((s) => s.id === paymentModalApt.serviceId)?.name}
-              </p>
-            </div>
+            {(() => {
+              const currentService = services.find((s) => s.id === paymentModalApt.serviceId);
+              const currentBarber = barbers.find((b) => b.id === paymentModalApt.barberId);
+              const servicePrice = currentService?.price ?? paymentAmount;
+              const cashNumber = parseFloat(cashGiven) || 0;
+              const changeDue = cashNumber > servicePrice ? cashNumber - servicePrice : 0;
 
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-stone-300 block mb-1.5">
-                  Forma de Pagamento
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'PIX', label: 'PIX', icon: QrCode },
-                    { id: 'DINHEIRO', label: 'Dinheiro', icon: Banknote },
-                    { id: 'CARTAO_CREDITO', label: 'Cartão Crédito', icon: CreditCard },
-                    { id: 'CARTAO_DEBITO', label: 'Cartão Débito', icon: CreditCard }
-                  ].map((m) => {
-                    const Icon = m.icon;
-                    const isSel = paymentMethod === m.id;
-                    return (
-                      <button
-                        key={m.id}
-                        type="button"
-                        id={`payment-method-${m.id}`}
-                        onClick={() => setPaymentMethod(m.id as PaymentMethod)}
-                        className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
-                          isSel
-                            ? 'bg-teal-500/20 text-teal-300 border-teal-500'
-                            : 'bg-stone-950 border-stone-800 text-stone-400 hover:border-stone-700'
-                        }`}
+              return (
+                <>
+                  <div className="my-4 p-3.5 bg-stone-950 rounded-2xl border border-stone-800 space-y-2 text-xs">
+                    <div className="flex justify-between items-center pb-2 border-b border-stone-800/80">
+                      <span className="text-stone-400">Cliente:</span>
+                      <span className="font-semibold text-stone-200">{paymentModalApt.clientName}</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-2 border-b border-stone-800/80">
+                      <span className="text-stone-400">Serviço Realizado:</span>
+                      <span className="font-semibold text-teal-300">{currentService?.name}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-stone-400">Barbeiro Responsável:</span>
+                      <span className="font-semibold text-stone-200">{currentBarber?.name || 'Profissional'}</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-semibold text-stone-300 block mb-1.5">
+                        Forma de Pagamento
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { id: 'PIX', label: 'PIX', icon: QrCode },
+                          { id: 'DINHEIRO', label: 'Dinheiro', icon: Banknote },
+                          { id: 'CARTAO_CREDITO', label: 'Cartão Crédito', icon: CreditCard },
+                          { id: 'CARTAO_DEBITO', label: 'Cartão Débito', icon: CreditCard }
+                        ].map((m) => {
+                          const Icon = m.icon;
+                          const isSel = paymentMethod === m.id;
+                          return (
+                            <button
+                              key={m.id}
+                              type="button"
+                              id={`payment-method-${m.id}`}
+                              onClick={() => setPaymentMethod(m.id as PaymentMethod)}
+                              className={`p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${
+                                isSel
+                                  ? 'bg-teal-500/20 text-teal-300 border-teal-500'
+                                  : 'bg-stone-950 border-stone-800 text-stone-400 hover:border-stone-700'
+                              }`}
+                            >
+                              <Icon className="w-4 h-4" />
+                              {m.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* VALOR FIXO NÃO EDITÁVEL VEM DIRETO DO SERVIÇO */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-stone-300 flex items-center gap-1.5">
+                          <Lock className="w-3.5 h-3.5 text-teal-400" />
+                          <span>Valor a ser Pago (Fixo do Serviço)</span>
+                        </label>
+                        <span className="text-[10px] text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-full border border-teal-500/20 font-medium flex items-center gap-1">
+                          <Lock className="w-2.5 h-2.5" />
+                          Não editável
+                        </span>
+                      </div>
+
+                      <div
+                        id="payment-amount-locked-display"
+                        className="w-full px-4 py-3 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-between shadow-inner select-none cursor-not-allowed"
                       >
-                        <Icon className="w-4 h-4" />
-                        {m.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-stone-400 font-bold text-xs">R$</span>
+                          <span className="text-2xl font-extrabold text-teal-300 font-mono tracking-tight">
+                            {servicePrice.toFixed(2).replace('.', ',')}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-stone-400 bg-stone-900 px-2.5 py-1 rounded-lg border border-stone-800 font-medium">
+                          Tabela do Serviço
+                        </span>
+                      </div>
 
-              <div>
-                <label className="text-xs font-semibold text-stone-300 block mb-1">
-                  Valor Pago (R$)
-                </label>
-                <input
-                  type="number"
-                  step="0.50"
-                  id="input-payment-amount"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(parseFloat(e.target.value) || 0)}
-                  className="w-full px-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-100 font-bold text-sm focus:outline-none focus:border-teal-500"
-                />
-              </div>
-            </div>
+                      <p className="text-[11px] text-stone-400">
+                        O valor foi obtido diretamente do serviço efetuado (<strong className="text-stone-300">{currentService?.name}</strong>) e não pode ser alterado no momento do pagamento.
+                      </p>
+                    </div>
+
+                    {/* TROCO CASO SEJA DINHEIRO */}
+                    {paymentMethod === 'DINHEIRO' && (
+                      <div className="p-3 bg-stone-950/80 rounded-xl border border-stone-800 space-y-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <label htmlFor="input-cash-given" className="text-stone-300 font-medium flex items-center gap-1.5">
+                            <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Valor recebido do cliente (opcional):</span>
+                          </label>
+                          <div className="flex items-center gap-1">
+                            <span className="text-stone-500 font-bold">R$</span>
+                            <input
+                              type="number"
+                              id="input-cash-given"
+                              placeholder="0,00"
+                              value={cashGiven}
+                              onChange={(e) => setCashGiven(e.target.value)}
+                              className="w-24 px-2.5 py-1 bg-stone-900 border border-stone-700 rounded-lg text-stone-100 font-mono text-right text-xs focus:outline-none focus:border-teal-500"
+                            />
+                          </div>
+                        </div>
+                        {cashNumber > 0 && (
+                          <div className="flex items-center justify-between pt-1.5 border-t border-stone-800 text-xs">
+                            <span className="text-stone-400">Troco a devolver:</span>
+                            <span className={`font-mono font-bold text-sm ${cashNumber >= servicePrice ? 'text-emerald-400' : 'text-amber-400'}`}>
+                              {cashNumber >= servicePrice
+                                ? `R$ ${changeDue.toFixed(2).replace('.', ',')}`
+                                : 'Valor informado menor que o total'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
+              );
+            })()}
 
             <div className="flex justify-end gap-2.5 mt-6">
               <button
