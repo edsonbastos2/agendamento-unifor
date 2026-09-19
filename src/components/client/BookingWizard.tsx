@@ -516,7 +516,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
             </button>
             <h2 className="text-xl sm:text-2xl font-bold text-stone-100">Confirmação do Agendamento</h2>
             <p className="text-sm text-stone-400 mt-1">
-              Revise os dados antes de confirmar. Um SMS de confirmação será enviado automaticamente (RF-19).
+              Revise os dados antes de confirmar. Uma confirmação será enviada automaticamente para seu contato.
             </p>
           </div>
 

@@ -28,7 +28,7 @@ export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ isOpen, 
               <Bell className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-sm text-stone-100">Notificações do Sistema (RF-19)</h3>
+              <h3 className="font-bold text-sm text-stone-100">Notificações do Sistema</h3>
               <p className="text-[11px] text-stone-400">Disparos automáticos por SMS e E-mail</p>
             </div>
           </div>

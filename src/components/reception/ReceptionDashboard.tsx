@@ -147,7 +147,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-stone-100">Painel da Recepção</h2>
           <p className="text-sm text-stone-400 mt-1">
-            Gestão operacional dos atendimentos, confirmação de presença (RF-14), pagamentos (RF-15) e controle de ciclo de vida.
+            Gestão operacional dos atendimentos, confirmação de presença, pagamentos e controle do fluxo da barbearia.
           </p>
         </div>
 
@@ -156,20 +156,20 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
             id="btn-rec-check-tolerance"
             onClick={handleCheckTolerance}
             className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold border border-stone-700 transition-all flex items-center gap-1.5"
-            title="Verificar tolerância de atraso (RF-11)"
+            title="Verificar tolerância de atraso"
           >
             <Timer className="w-4 h-4 text-amber-400" />
-            Checar Tolerâncias (RF-11)
+            Checar Tolerâncias
           </button>
 
           <button
             id="btn-rec-batch-cancel-open"
             onClick={onBatchCancelClick}
             className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold border border-rose-500/30 transition-all flex items-center gap-1.5"
-            title="Cancelar atendimentos futuros em lote (RF-12)"
+            title="Cancelar atendimentos em lote"
           >
             <AlertTriangle className="w-4 h-4 text-rose-400" />
-            Cancelar em Lote (RF-12)
+            Cancelar em Lote
           </button>
 
           <button
@@ -349,45 +349,41 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
 
                 {/* Status Action Buttons for Receptionist */}
                 <div className="flex flex-wrap items-center gap-2 pt-3 lg:pt-0 border-t lg:border-t-0 border-stone-800 shrink-0">
-                  {/* Step 1 in Lifecycle: AGENDADO -> CONFIRMAR PRESENÇA (RF-14) */}
                   {apt.status === 'AGENDADO' && (
                     <button
                       id={`btn-confirm-attendance-${apt.id}`}
                       onClick={() => confirmAttendance(apt.id)}
                       className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 transition-all flex items-center gap-1"
-                      title="Confirmar que o cliente chegou à barbearia (RF-14)"
+                      title="Confirmar que o cliente chegou à barbearia"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      Confirmar Presença (RF-14)
+                      Confirmar Presença
                     </button>
                   )}
 
-                  {/* Step 2 in Lifecycle: REALIZADO -> REGISTRAR PAGAMENTO (RF-15) */}
                   {apt.status === 'REALIZADO' && (
                     <button
                       id={`btn-register-payment-${apt.id}`}
                       onClick={() => handleOpenPayment(apt)}
                       className="px-3.5 py-1.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-stone-950 text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-md"
-                      title="Registrar recebimento de pagamento (RF-15)"
+                      title="Registrar recebimento de pagamento"
                     >
                       <DollarSign className="w-4 h-4" />
-                      Registrar Pagamento (RF-15)
+                      Registrar Pagamento
                     </button>
                   )}
 
-                  {/* Tolerância / Não compareceu (RF-11) */}
                   {apt.status === 'AGENDADO' && (
                     <button
                       id={`btn-mark-no-show-${apt.id}`}
                       onClick={() => markNoShow(apt.id)}
                       className="px-2.5 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-stone-200 text-xs font-medium transition-all"
-                      title="Cliente não compareceu após tolerância (RF-11)"
+                      title="Cliente não compareceu após tolerância"
                     >
                       Não Compareceu
                     </button>
                   )}
 
-                  {/* Reagendar (RF-13) */}
                   {['AGENDADO', 'CONFIRMADO'].includes(apt.status) && (
                     <button
                       id={`btn-rec-reschedule-${apt.id}`}
@@ -399,13 +395,12 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
                         setRescheduleReason('');
                       }}
                       className="p-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs"
-                      title="Reagendar (RF-13)"
+                      title="Reagendar horário"
                     >
                       <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
                     </button>
                   )}
 
-                  {/* Cancelar com Motivo (RF-10) */}
                   {['AGENDADO', 'CONFIRMADO'].includes(apt.status) && (
                     <button
                       id={`btn-rec-cancel-${apt.id}`}
@@ -414,7 +409,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
                         setCancelReason('');
                       }}
                       className="p-2 rounded-xl bg-stone-800 hover:bg-rose-500/20 text-stone-400 hover:text-rose-400 text-xs"
-                      title="Cancelar com motivo (RF-10)"
+                      title="Cancelar atendimento"
                     >
                       <XCircle className="w-3.5 h-3.5" />
                     </button>
@@ -426,7 +421,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
         </div>
       )}
 
-      {/* PAYMENT MODAL (RF-15) */}
+      {/* PAYMENT MODAL */}
       {paymentModalApt && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95">
@@ -434,7 +429,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
               <div className="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center">
                 <DollarSign className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-lg text-stone-100">Registrar Pagamento (RF-15)</h3>
+              <h3 className="font-bold text-lg text-stone-100">Registrar Pagamento</h3>
             </div>
 
             <p className="text-xs text-stone-400">
@@ -519,13 +514,13 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
         </div>
       )}
 
-      {/* CANCEL MODAL FOR RECEPTIONIST (RF-10) */}
+      {/* CANCEL MODAL FOR RECEPTIONIST */}
       {cancelModalApt && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95">
             <div className="flex items-center gap-3 text-rose-400 mb-3">
               <XCircle className="w-6 h-6" />
-              <h3 className="font-bold text-lg text-stone-100">Cancelar Agendamento (RF-10)</h3>
+              <h3 className="font-bold text-lg text-stone-100">Cancelar Agendamento</h3>
             </div>
             <p className="text-xs text-stone-400">
               Informe o motivo do cancelamento para registrar no histórico e liberar o horário na agenda do barbeiro.
@@ -560,13 +555,13 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
         </div>
       )}
 
-      {/* RESCHEDULE MODAL FOR RECEPTIONIST (RF-13) */}
+      {/* RESCHEDULE MODAL FOR RECEPTIONIST */}
       {rescheduleModalApt && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95">
             <div className="flex items-center gap-3 text-amber-400 mb-3">
               <RotateCcw className="w-6 h-6" />
-              <h3 className="font-bold text-lg text-stone-100">Reagendar Atendimento (RF-13)</h3>
+              <h3 className="font-bold text-lg text-stone-100">Reagendar Atendimento</h3>
             </div>
             <div className="space-y-3 text-xs">
               <div>

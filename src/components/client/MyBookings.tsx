@@ -107,7 +107,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
   const handleConfirmCancel = () => {
     if (!cancelModalApt) return;
     if (!cancelReason.trim()) {
-      setCancelError('Por favor, informe o motivo do cancelamento (RF-10).');
+      setCancelError('Por favor, informe o motivo do cancelamento.');
       return;
     }
 
@@ -131,7 +131,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
   const handleConfirmReschedule = () => {
     if (!rescheduleModalApt) return;
     if (!rescheduleReason.trim()) {
-      setRescheduleError('Por favor, informe o motivo do reagendamento (RF-13).');
+      setRescheduleError('Por favor, informe o motivo do reagendamento.');
       return;
     }
     if (!rescheduleSlot) {
@@ -164,7 +164,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
       {/* Header & Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-stone-100">Meus Agendamentos (RF-09)</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-stone-100">Meus Agendamentos</h2>
           <p className="text-sm text-stone-400 mt-1">
             Consulte seu histórico completo, cancele ou reagende seus horários em tempo real.
           </p>
@@ -311,7 +311,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
                       id={`btn-reschedule-${apt.id}`}
                       onClick={() => handleOpenRescheduleModal(apt)}
                       className="px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold border border-stone-700 transition-all flex items-center gap-1.5"
-                      title="Reagendar horário (RF-13)"
+                      title="Reagendar horário"
                     >
                       <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
                       Reagendar
@@ -321,7 +321,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
                       id={`btn-cancel-${apt.id}`}
                       onClick={() => handleOpenCancelModal(apt)}
                       className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/30 transition-all flex items-center gap-1.5"
-                      title="Cancelar agendamento (RF-10)"
+                      title="Cancelar agendamento"
                     >
                       <XCircle className="w-3.5 h-3.5" />
                       Cancelar
@@ -334,7 +334,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
         </div>
       )}
 
-      {/* MODAL CANCELAR AGENDAMENTO (RF-10) */}
+      {/* MODAL CANCELAR AGENDAMENTO */}
       {cancelModalApt && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95">
@@ -342,7 +342,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
               <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
                 <XCircle className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-lg text-stone-100">Cancelar Agendamento (RF-10)</h3>
+              <h3 className="font-bold text-lg text-stone-100">Cancelar Agendamento</h3>
             </div>
 
             <p className="text-xs text-stone-400">
@@ -394,7 +394,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
         </div>
       )}
 
-      {/* MODAL REAGENDAR (RF-13) */}
+      {/* MODAL REAGENDAR */}
       {rescheduleModalApt && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
@@ -402,7 +402,7 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
                 <RotateCcw className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-lg text-stone-100">Reagendar Atendimento (RF-13)</h3>
+              <h3 className="font-bold text-lg text-stone-100">Reagendar Atendimento</h3>
             </div>
 
             <p className="text-xs text-stone-400">

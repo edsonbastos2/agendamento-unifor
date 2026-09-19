@@ -8,8 +8,8 @@ import { BatchCancelModal } from './components/reception/BatchCancelModal';
 import { BarberScheduleView } from './components/barber/BarberScheduleView';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { AuthModal } from './components/auth/AuthModal';
+import { LoginView } from './components/auth/LoginView';
 import { NotificationDrawer } from './components/notifications/NotificationDrawer';
-import { RequirementsMatrixModal } from './components/common/RequirementsMatrixModal';
 import { UserRole } from './types';
 
 function MainApp() {
@@ -18,11 +18,12 @@ function MainApp() {
   const [activeTab, setActiveTab] = useState<string>('agendar');
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register' | 'reset' | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showRequirementsModal, setShowRequirementsModal] = useState(false);
   const [showBatchCancelModal, setShowBatchCancelModal] = useState(false);
 
-  // Sync tab with user role if mismatch occurs
+  // Sync tab with user role if mismatch occurs, except when deliberately on the login screen
   useEffect(() => {
+    if (activeTab === 'login') return;
+
     if (currentUser.role === 'cliente') {
       if (!['agendar', 'meus-agendamentos'].includes(activeTab)) {
         setActiveTab('agendar');
@@ -40,14 +41,20 @@ function MainApp() {
         setActiveTab('admin-servicos');
       }
     }
-  }, [currentUser.role]);
+  }, [currentUser.role, activeTab]);
 
-  const handleSwitchRoleAndTab = (role: UserRole, tab: string) => {
-    switchRole(role);
-    setActiveTab(tab);
-    if (tab === 'recepcao-lote') {
-      setShowBatchCancelModal(true);
-    }
+  const handleLoginSuccess = (role: UserRole) => {
+    if (role === 'cliente') setActiveTab('agendar');
+    else if (role === 'recepcionista') setActiveTab('recepcao');
+    else if (role === 'barbeiro') setActiveTab('agenda-barbeiro');
+    else if (role === 'administrador') setActiveTab('admin-servicos');
+  };
+
+  const handleBackToApp = () => {
+    if (currentUser.role === 'cliente') setActiveTab('agendar');
+    else if (currentUser.role === 'recepcionista') setActiveTab('recepcao');
+    else if (currentUser.role === 'barbeiro') setActiveTab('agenda-barbeiro');
+    else if (currentUser.role === 'administrador') setActiveTab('admin-servicos');
   };
 
   return (
@@ -58,13 +65,20 @@ function MainApp() {
         setActiveTab={setActiveTab}
         onOpenAuthModal={(mode) => setAuthModalMode(mode)}
         onOpenNotifications={() => setShowNotifications(true)}
-        onOpenRequirementsModal={() => setShowRequirementsModal(true)}
       />
 
       {/* Main Dynamic Viewport */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* DEDICATED LOGIN SCREEN VIEW */}
+        {activeTab === 'login' && (
+          <LoginView
+            onSuccess={handleLoginSuccess}
+            onBackToApp={handleBackToApp}
+          />
+        )}
+
         {/* CLIENT ROLE VIEWS */}
-        {currentUser.role === 'cliente' && (
+        {activeTab !== 'login' && currentUser.role === 'cliente' && (
           <>
             {activeTab === 'agendar' && (
               <BookingWizard
@@ -78,7 +92,7 @@ function MainApp() {
         )}
 
         {/* RECEPTIONIST ROLE VIEWS */}
-        {currentUser.role === 'recepcionista' && (
+        {activeTab !== 'login' && currentUser.role === 'recepcionista' && (
           <>
             {(activeTab === 'recepcao' || activeTab === 'recepcao-lote') && (
               <ReceptionDashboard
@@ -108,12 +122,12 @@ function MainApp() {
         )}
 
         {/* BARBER ROLE VIEWS */}
-        {currentUser.role === 'barbeiro' && (
+        {activeTab !== 'login' && currentUser.role === 'barbeiro' && (
           <BarberScheduleView />
         )}
 
         {/* ADMINISTRATOR ROLE VIEWS */}
-        {currentUser.role === 'administrador' && (
+        {activeTab !== 'login' && currentUser.role === 'administrador' && (
           <AdminDashboard
             activeSubTab={
               activeTab === 'admin-barbeiros'
@@ -137,22 +151,22 @@ function MainApp() {
 
           <div className="flex items-center gap-4 text-xs">
             <button
-              onClick={() => setShowRequirementsModal(true)}
-              className="text-amber-400 hover:underline font-semibold"
+              onClick={() => setActiveTab('login')}
+              className="text-amber-400 hover:text-amber-300 font-semibold transition-colors flex items-center gap-1.5"
             >
-              Ver Casos de Uso & Requisitos (IEEE 830)
+              <span>Tela de Login / Autenticação</span>
             </button>
-            <span>•</span>
+            <span className="text-stone-700">•</span>
             <button
               onClick={() => setShowNotifications(true)}
-              className="text-stone-300 hover:text-stone-100"
+              className="text-stone-300 hover:text-amber-400 transition-colors flex items-center gap-1.5"
             >
-              Simulador SMS/E-mail (RF-19)
+              <span>Simulador de Notificações (SMS / E-mail)</span>
             </button>
           </div>
 
-          <div className="text-stone-400 text-[11px]">
-            Conformidade total com requisitos funcionais RF-01 a RF-19
+          <div className="text-stone-500 text-[11px]">
+            © {new Date().getFullYear()} Navalha & Arte Barbearia. Todos os direitos reservados.
           </div>
         </div>
       </footer>
@@ -169,12 +183,6 @@ function MainApp() {
       <NotificationDrawer
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
-      />
-
-      <RequirementsMatrixModal
-        isOpen={showRequirementsModal}
-        onClose={() => setShowRequirementsModal(false)}
-        onSwitchRoleAndTab={handleSwitchRoleAndTab}
       />
 
       <BatchCancelModal

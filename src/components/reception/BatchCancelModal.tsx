@@ -33,7 +33,7 @@ export const BatchCancelModal: React.FC<BatchCancelModalProps> = ({ isOpen, onCl
     setFeedback(null);
 
     if (!reason.trim()) {
-      setFeedback({ type: 'error', message: 'O motivo do cancelamento em lote é obrigatório (RF-12).' });
+      setFeedback({ type: 'error', message: 'O motivo do cancelamento em lote é obrigatório.' });
       return;
     }
 
@@ -41,7 +41,7 @@ export const BatchCancelModal: React.FC<BatchCancelModalProps> = ({ isOpen, onCl
     if (res.success) {
       setFeedback({
         type: 'success',
-        message: `${res.affectedCount} agendamento(s) cancelados em lote com sucesso. Todos os clientes afetados receberam notificações automáticas (RF-19).`
+        message: `${res.affectedCount} agendamento(s) cancelados em lote com sucesso. Todos os clientes afetados receberam notificações automáticas.`
       });
       setReason('');
     } else {
@@ -58,7 +58,7 @@ export const BatchCancelModal: React.FC<BatchCancelModalProps> = ({ isOpen, onCl
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-stone-100">Cancelamento em Lote (RF-12)</h3>
+              <h3 className="font-bold text-lg text-stone-100">Cancelamento em Lote</h3>
               <p className="text-xs text-stone-400">
                 Cancele agendamentos futuros de um profissional por motivo de folga médica ou imprevisto.
               </p>

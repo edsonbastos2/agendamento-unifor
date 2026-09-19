@@ -80,7 +80,7 @@ export const BarberScheduleView: React.FC = () => {
               Agenda do Barbeiro: {activeBarber?.name}
             </h2>
             <p className="text-xs text-stone-400 mt-0.5">
-              Acompanhamento de horários marcados e finalização de atendimentos (RF-16, RF-18).
+              Acompanhamento de horários marcados e finalização de atendimentos em tempo real.
             </p>
           </div>
         </div>
@@ -233,17 +233,17 @@ export const BarberScheduleView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Barber Action Button: Finalizar Atendimento (RF-16) */}
+                    {/* Barber Action Button: Finalizar Atendimento */}
                     <div className="flex items-center gap-2 shrink-0">
                       {isReadyToFinish && (
                         <button
                           id={`btn-finish-service-${apt.id}`}
                           onClick={() => handleFinish(apt.id, apt.clientName)}
                           className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-md"
-                          title="Finalizar atendimento e liberar para pagamento na recepção (RF-16)"
+                          title="Finalizar atendimento e liberar para pagamento na recepção"
                         >
                           <CheckCircle2 className="w-4 h-4" />
-                          Finalizar Atendimento (RF-16)
+                          Finalizar Atendimento
                         </button>
                       )}
 

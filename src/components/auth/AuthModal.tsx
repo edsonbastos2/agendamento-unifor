@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { User, Lock, Mail, Phone, X, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { UserRole } from '../../types';
+import {
+  User,
+  Lock,
+  Mail,
+  Phone,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Briefcase,
+  Scissors,
+  Shield,
+  Check
+} from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -9,9 +22,10 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClose }) => {
-  const { loginUser, registerClient, resetPassword, users } = useApp();
+  const { loginUser, registerUser, resetPassword } = useApp();
 
   const [mode, setMode] = useState<'login' | 'register' | 'reset'>(initialMode);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('cliente');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -37,7 +51,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     setFeedback(null);
-    const res = registerClient(name, email, phone, password);
+    const res = registerUser({
+      role: selectedRole,
+      name,
+      email,
+      phone,
+      password
+    });
     if (res.success) {
       setFeedback({ type: 'success', message: res.message });
       setTimeout(onClose, 1200);
@@ -59,14 +79,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95">
+      <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-800">
           <div>
             <h3 className="font-bold text-lg text-stone-100">
-              {mode === 'login' && 'Autenticar Usuário (RF-03)'}
-              {mode === 'register' && 'Criar Conta de Cliente (RF-01)'}
-              {mode === 'reset' && 'Redefinir Senha (RF-02)'}
+              {mode === 'login' && 'Autenticar Usuário'}
+              {mode === 'register' && `Criar Conta: ${selectedRole.toUpperCase()}`}
+              {mode === 'reset' && 'Redefinir Senha'}
             </h3>
             <p className="text-xs text-stone-400 mt-0.5">
               Acesso seguro e restrito por perfil de usuário
@@ -101,23 +121,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
         {mode === 'login' && (
           <form onSubmit={handleLogin} className="space-y-3.5 my-4 text-xs">
             <div>
-              <label className="text-stone-300 font-semibold block mb-1">E-mail</label>
+              <label className="text-stone-300 font-semibold block mb-1">E-mail ou Celular</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
-                  type="email"
+                  type="text"
                   id="auth-input-email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="seu.email@exemplo.com"
+                  placeholder="ex: cliente@email.com"
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 focus:outline-none focus:border-amber-500"
                 />
               </div>
             </div>
 
             <div>
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex items-center justify-between mb-1">
                 <label className="text-stone-300 font-semibold">Senha</label>
                 <button
                   type="button"
@@ -125,7 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
                     setFeedback(null);
                     setMode('reset');
                   }}
-                  className="text-[11px] text-amber-400 hover:underline"
+                  className="text-stone-400 hover:text-amber-400 text-[11px]"
                 >
                   Esqueceu a senha?
                 </button>
@@ -162,15 +182,75 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
                 }}
                 className="text-amber-400 font-bold hover:underline"
               >
-                Criar conta de cliente
+                Criar conta (por perfil)
               </button>
             </div>
           </form>
         )}
 
-        {/* 2. REGISTER (RF-01) */}
+        {/* 2. REGISTER (Por Perfil de Usuário) */}
         {mode === 'register' && (
           <form onSubmit={handleRegister} className="space-y-3 my-4 text-xs">
+            {/* Role selector */}
+            <div>
+              <label className="text-stone-300 font-semibold block mb-1.5">
+                Escolha o Perfil de Conta:
+              </label>
+              <div className="grid grid-cols-4 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSelectedRole('cliente')}
+                  className={`p-2 rounded-xl border text-center transition-all ${
+                    selectedRole === 'cliente'
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-300'
+                      : 'bg-stone-950 border-stone-800 text-stone-400'
+                  }`}
+                >
+                  <User className="w-3.5 h-3.5 mx-auto mb-1" />
+                  <span className="text-[10px] font-bold block">Cliente</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRole('recepcionista')}
+                  className={`p-2 rounded-xl border text-center transition-all ${
+                    selectedRole === 'recepcionista'
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                      : 'bg-stone-950 border-stone-800 text-stone-400'
+                  }`}
+                >
+                  <Briefcase className="w-3.5 h-3.5 mx-auto mb-1" />
+                  <span className="text-[10px] font-bold block">Recepção</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRole('barbeiro')}
+                  className={`p-2 rounded-xl border text-center transition-all ${
+                    selectedRole === 'barbeiro'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                      : 'bg-stone-950 border-stone-800 text-stone-400'
+                  }`}
+                >
+                  <Scissors className="w-3.5 h-3.5 mx-auto mb-1" />
+                  <span className="text-[10px] font-bold block">Barbeiro</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRole('administrador')}
+                  className={`p-2 rounded-xl border text-center transition-all ${
+                    selectedRole === 'administrador'
+                      ? 'bg-rose-500/20 border-rose-500 text-rose-300'
+                      : 'bg-stone-950 border-stone-800 text-stone-400'
+                  }`}
+                >
+                  <Shield className="w-3.5 h-3.5 mx-auto mb-1" />
+                  <span className="text-[10px] font-bold block">Admin</span>
+                </button>
+              </div>
+            </div>
+
             <div>
               <label className="text-stone-300 font-semibold block mb-1">Nome Completo *</label>
               <div className="relative">
@@ -204,7 +284,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
             </div>
 
             <div>
-              <label className="text-stone-300 font-semibold block mb-1">Telefone / Celular *</label>
+              <label className="text-stone-300 font-semibold block mb-1">Telefone / WhatsApp *</label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -229,7 +309,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Mínimo de 6 dígitos"
                   className="w-full pl-9 pr-3 py-2 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 focus:outline-none focus:border-amber-500"
                 />
               </div>
@@ -240,7 +320,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
               id="reg-btn-submit"
               className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-all shadow-lg mt-2"
             >
-              Criar Minha Conta (RF-01)
+              Criar Conta de {selectedRole.toUpperCase()}
             </button>
 
             <div className="text-center pt-3 border-t border-stone-800 text-stone-400 text-xs">
@@ -262,23 +342,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
         {/* 3. RESET PASSWORD (RF-02) */}
         {mode === 'reset' && (
           <form onSubmit={handleReset} className="space-y-3.5 my-4 text-xs">
-            <p className="text-stone-400 text-xs leading-relaxed">
-              O sistema enviará um link de recuperação para o e-mail ou telefone cadastrado (RF-02).
-            </p>
-
             <div>
               <label className="text-stone-300 font-semibold block mb-1">
-                E-mail ou Telefone Cadastrado *
+                E-mail ou Celular Cadastrado
               </label>
-              <input
-                type="text"
-                id="reset-input-identifier"
-                required
-                value={resetIdentifier}
-                onChange={(e) => setResetIdentifier(e.target.value)}
-                placeholder="email@exemplo.com ou (11) 98765-4321"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 focus:outline-none focus:border-amber-500"
-              />
+              <div className="relative">
+                <Mail className="w-4 h-4 text-stone-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  id="reset-input-identifier"
+                  required
+                  value={resetIdentifier}
+                  onChange={(e) => setResetIdentifier(e.target.value)}
+                  placeholder="ex: cliente@email.com ou (11) 98765-4321"
+                  className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-stone-950 border border-stone-800 text-stone-200 focus:outline-none focus:border-amber-500"
+                />
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 text-stone-400 text-[11px] leading-relaxed">
+              O sistema despachará um link seguro temporário para seu número ou e-mail cadastrado
+              para recuperação imediata de senha.
             </div>
 
             <button
@@ -286,10 +370,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
               id="reset-btn-submit"
               className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-all shadow-lg mt-2"
             >
-              Enviar Link de Recuperação (RF-02)
+              Enviar Link de Redefinição
             </button>
 
             <div className="text-center pt-3 border-t border-stone-800 text-stone-400 text-xs">
+              Lembrou sua senha?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -298,7 +383,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, initialMode, onClo
                 }}
                 className="text-amber-400 font-bold hover:underline"
               >
-                ← Voltar para o login
+                Voltar para o Login
               </button>
             </div>
           </form>

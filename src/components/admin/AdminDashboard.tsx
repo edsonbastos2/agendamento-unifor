@@ -146,7 +146,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
     if (!scheduleBarberId) return;
     updateBarberSchedule(scheduleBarberId, tempSchedule, toleranceMin);
     setScheduleBarberId(null);
-    setFeedback('Jornada de trabalho e tolerância do barbeiro atualizadas com sucesso! (RF-17)');
+    setFeedback('Jornada de trabalho e tolerância do barbeiro atualizadas com sucesso!');
     setTimeout(() => setFeedback(null), 4000);
   };
 
@@ -157,7 +157,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
         <div>
           <h2 className="text-xl sm:text-2xl font-bold text-stone-100">Painel do Administrador</h2>
           <p className="text-sm text-stone-400 mt-1">
-            Gestão cadastral de serviços (RF-08), barbeiros e primeiro acesso (RF-06), recepcionistas (RF-07) e definição de jornadas de trabalho (RF-17).
+            Gestão completa de serviços, equipe de barbeiros, recepcionistas e jornadas de trabalho.
           </p>
         </div>
 
@@ -217,7 +217,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
               className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-all flex items-center gap-1.5 shadow-md"
             >
               <Plus className="w-4 h-4" />
-              Cadastrar Novo Serviço (RF-08)
+              Cadastrar Novo Serviço
             </button>
           </div>
 
@@ -280,7 +280,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
               className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-all flex items-center gap-1.5 shadow-md"
             >
               <Plus className="w-4 h-4" />
-              Cadastrar Barbeiro (RF-06)
+              Cadastrar Barbeiro
             </button>
           </div>
 
@@ -332,7 +332,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
                       className="px-3 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-400 font-semibold border border-stone-700 flex items-center gap-1"
                     >
                       <Clock className="w-3.5 h-3.5" />
-                      Definir Jornada (RF-17)
+                      Definir Jornada
                     </button>
                   </div>
                 </div>
@@ -342,7 +342,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
         </div>
       )}
 
-      {/* 3. RECEPCIONISTAS (RF-07) */}
+      {/* 3. RECEPCIONISTAS */}
       {currentTab === 'recepcao' && (
         <div className="space-y-4 animate-in fade-in">
           <div className="flex items-center justify-between">
@@ -359,7 +359,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
               className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs transition-all flex items-center gap-1.5 shadow-md"
             >
               <Plus className="w-4 h-4" />
-              Cadastrar Recepcionista (RF-07)
+              Cadastrar Recepcionista
             </button>
           </div>
 
@@ -403,11 +403,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
         </div>
       )}
 
-      {/* MODAL CADASTRAR SERVIÇO (RF-08) */}
+      {/* MODAL CADASTRAR SERVIÇO */}
       {showServiceModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95">
-            <h3 className="font-bold text-lg text-stone-100 mb-1">Cadastrar Serviço (RF-08)</h3>
+            <h3 className="font-bold text-lg text-stone-100 mb-1">Cadastrar Serviço</h3>
             <p className="text-xs text-stone-400 mb-4">
               Informe nome, descrição, preço, duração e associe os barbeiros aptos a executá-lo.
             </p>
@@ -512,11 +512,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
         </div>
       )}
 
-      {/* MODAL CADASTRAR BARBEIRO (RF-06: Link de primeiro acesso) */}
+      {/* MODAL CADASTRAR BARBEIRO */}
       {showBarberModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-lg w-full shadow-2xl animate-in zoom-in-95">
-            <h3 className="font-bold text-lg text-stone-100 mb-1">Cadastrar Novo Barbeiro (RF-06)</h3>
+            <h3 className="font-bold text-lg text-stone-100 mb-1">Cadastrar Novo Barbeiro</h3>
             <p className="text-xs text-stone-400 mb-4">
               O sistema gera um link de primeiro acesso para que o barbeiro defina sua própria senha, sem que o administrador tenha conhecimento dela.
             </p>
@@ -635,11 +635,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
         </div>
       )}
 
-      {/* MODAL CADASTRAR RECEPCIONISTA (RF-07: Link de primeiro acesso) */}
+      {/* MODAL CADASTRAR RECEPCIONISTA */}
       {showRecModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-md w-full shadow-2xl animate-in zoom-in-95">
-            <h3 className="font-bold text-lg text-stone-100 mb-1">Cadastrar Recepcionista (RF-07)</h3>
+            <h3 className="font-bold text-lg text-stone-100 mb-1">Cadastrar Recepcionista</h3>
             <p className="text-xs text-stone-400 mb-4">
               Cadastro com link de primeiro acesso para definição confidencial de senha.
             </p>
@@ -722,12 +722,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
         </div>
       )}
 
-      {/* MODAL DEFINIR HORÁRIOS DE TRABALHO (RF-17) */}
+      {/* MODAL DEFINIR HORÁRIOS DE TRABALHO */}
       {scheduleBarberId && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-stone-900 border border-stone-800 rounded-3xl p-6 max-w-2xl w-full shadow-2xl animate-in zoom-in-95 max-h-[90vh] overflow-y-auto">
             <h3 className="font-bold text-lg text-stone-100 mb-1">
-              Definir Horários de Trabalho (RF-17)
+              Definir Horários de Trabalho
             </h3>
             <p className="text-xs text-stone-400 mb-4">
               Configure a jornada semanal contratada para{' '}
@@ -739,7 +739,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
 
             <div className="mb-4 p-3 bg-stone-950 rounded-2xl border border-stone-800 flex items-center justify-between text-xs">
               <span className="font-semibold text-stone-300">
-                Tolerância para atrasos antes do cancelamento automático (RF-11):
+                Tolerância para atrasos antes do cancelamento automático:
               </span>
               <div className="flex items-center gap-2">
                 <input
@@ -847,7 +847,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
                 onClick={handleSaveSchedule}
                 className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs"
               >
-                Salvar Horários de Trabalho (RF-17)
+                Salvar Horários de Trabalho
               </button>
             </div>
           </div>

@@ -33,6 +33,18 @@ interface AppContextType {
   setCurrentUser: (user: User) => void;
   switchRole: (role: UserRole) => void;
   registerClient: (name: string, email: string, phone: string, password?: string) => { success: boolean; message: string; user?: User };
+  registerUser: (data: {
+    role: UserRole;
+    name: string;
+    email: string;
+    phone: string;
+    password?: string;
+    bio?: string;
+    serviceIds?: string[];
+    shift?: string;
+    companyName?: string;
+    adminCode?: string;
+  }) => { success: boolean; message: string; user?: User };
   loginUser: (email: string, password?: string) => { success: boolean; message: string; user?: User };
   resetPassword: (identifier: string) => { success: boolean; message: string };
 
@@ -242,6 +254,94 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
 
     return { success: true, message: 'Conta criada com sucesso!', user: newUser };
+  };
+
+  // Criar conta para cada perfil (cliente, recepcionista, barbeiro, administrador)
+  const registerUser = (data: {
+    role: UserRole;
+    name: string;
+    email: string;
+    phone: string;
+    password?: string;
+    bio?: string;
+    serviceIds?: string[];
+    shift?: string;
+    companyName?: string;
+    adminCode?: string;
+  }) => {
+    const { role, name, email, phone } = data;
+    if (!name.trim() || !email.trim() || !phone.trim()) {
+      return { success: false, message: 'Por favor, preencha todos os campos obrigatórios (nome, e-mail e telefone).' };
+    }
+    const existing = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+    if (existing) {
+      return { success: false, message: 'Já existe uma conta cadastrada com este e-mail.' };
+    }
+
+    const newId = `user-${role}-${Date.now()}`;
+    const newUser: User = {
+      id: newId,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      role,
+      active: true,
+      bio: data.bio?.trim(),
+      shift: data.shift?.trim(),
+      companyName: data.companyName?.trim(),
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name.trim())}`
+    };
+
+    // Caso perfil seja Barbeiro: vincular aos serviços selecionados e criar grade semanal de horários
+    if (role === 'barbeiro') {
+      const selectedServiceIds =
+        data.serviceIds && data.serviceIds.length > 0
+          ? data.serviceIds
+          : services.map((s) => s.id);
+
+      setServices((prev) =>
+        prev.map((s) => {
+          if (selectedServiceIds.includes(s.id) && !s.barberIds.includes(newId)) {
+            return { ...s, barberIds: [...s.barberIds, newId] };
+          }
+          return s;
+        })
+      );
+
+      const defaultSchedule = INITIAL_BARBER_SCHEDULES[0].weeklySchedule;
+      setBarberSchedules((prev) => [
+        ...prev,
+        {
+          barberId: newId,
+          toleranceMinutes: 15,
+          weeklySchedule: JSON.parse(JSON.stringify(defaultSchedule))
+        }
+      ]);
+    }
+
+    setUsers((prev) => [...prev, newUser]);
+    setCurrentUser(newUser);
+
+    const roleLabels: Record<UserRole, string> = {
+      cliente: 'Cliente',
+      recepcionista: 'Recepcionista',
+      barbeiro: 'Barbeiro Profissional',
+      administrador: 'Administrador'
+    };
+
+    addNotification(
+      'CRIACAO',
+      'SMS',
+      newUser.phone,
+      `Boas-vindas - Conta de ${roleLabels[role]}`,
+      `Olá ${newUser.name}, sua conta de ${roleLabels[role]} foi ativada com sucesso na Barbearia Navalha & Arte!`
+    );
+
+    return {
+      success: true,
+      message: `Conta de ${roleLabels[role]} criada e ativada com sucesso!`,
+      user: newUser
+    };
   };
 
   // RF-03: Autenticar usuário
@@ -951,6 +1051,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setCurrentUser,
         switchRole,
         registerClient,
+        registerUser,
         loginUser,
         resetPassword,
         services,

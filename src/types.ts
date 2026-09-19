@@ -19,6 +19,8 @@ export interface User {
   avatar?: string;
   active: boolean;
   bio?: string;
+  shift?: string;
+  companyName?: string;
   firstAccessPending?: boolean;
 }
 
