@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { UserRole } from '../types';
+import { UserRole, ActorType } from '../types';
 import {
   Scissors,
   Bell,
@@ -15,7 +15,10 @@ import {
   RotateCcw,
   LogIn,
   Briefcase,
-  Shield
+  Shield,
+  Mail,
+  Smartphone,
+  Timer
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -33,6 +36,15 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { currentUser, switchRole, notifications, resetAllData } = useApp();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
+
+  const actorList: { id: ActorType; label: string; badge: string; isSystem?: boolean }[] = [
+    { id: 'cliente', label: 'Cliente', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+    { id: 'recepcionista', label: 'Recepcionista', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+    { id: 'barbeiro', label: 'Barbeiro', badge: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
+    { id: 'administrador', label: 'Administrador', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/30' },
+    { id: 'tempo', label: 'Ator: Tempo (RF-23)', badge: 'bg-purple-500/10 text-purple-400 border-purple-500/30', isSystem: true },
+    { id: 'notificacao', label: 'Ator: E-mail/SMS (RF-24)', badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30', isSystem: true }
+  ];
 
   const roleLabels: Record<UserRole, { label: string; badgeColor: string; roleDesc: string }> = {
     cliente: {
@@ -57,14 +69,22 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const handleRoleChange = (newRole: UserRole) => {
-    switchRole(newRole);
+  const handleActorClick = (actor: ActorType) => {
+    if (actor === 'tempo') {
+      setActiveTab('ator-tempo');
+      return;
+    }
+    if (actor === 'notificacao') {
+      setActiveTab('ator-notificacao');
+      return;
+    }
+
+    switchRole(actor as UserRole);
     setShowRoleMenu(false);
-    // Set default tab based on role
-    if (newRole === 'cliente') setActiveTab('agendar');
-    else if (newRole === 'recepcionista') setActiveTab('recepcao');
-    else if (newRole === 'barbeiro') setActiveTab('agenda-barbeiro');
-    else if (newRole === 'administrador') setActiveTab('admin-servicos');
+    if (actor === 'cliente') setActiveTab('agendar');
+    else if (actor === 'recepcionista') setActiveTab('recepcao');
+    else if (actor === 'barbeiro') setActiveTab('agenda-barbeiro');
+    else if (actor === 'administrador') setActiveTab('admin-servicos');
   };
 
   return (
@@ -74,25 +94,35 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center gap-2 text-stone-400">
           <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span className="font-medium text-stone-300">Modo de Avaliação Multi-Ator:</span>
-          <span className="hidden sm:inline text-stone-400">Alterne instantaneamente entre os 4 atores do caso de uso:</span>
+          <span className="hidden sm:inline text-stone-400">Visão completa dos 6 atores do sistema:</span>
         </div>
 
         <div className="flex items-center gap-1.5 overflow-x-auto py-0.5">
-          {(['cliente', 'recepcionista', 'barbeiro', 'administrador'] as UserRole[]).map((role) => {
-            const isActive = currentUser.role === role;
+          {actorList.map((actor) => {
+            const isActive =
+              actor.id === 'tempo'
+                ? activeTab === 'ator-tempo'
+                : actor.id === 'notificacao'
+                ? activeTab === 'ator-notificacao'
+                : currentUser.role === actor.id && activeTab !== 'ator-tempo' && activeTab !== 'ator-notificacao';
+
             return (
               <button
-                key={role}
-                id={`btn-role-switch-${role}`}
-                onClick={() => handleRoleChange(role)}
-                className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all whitespace-nowrap ${
+                key={actor.id}
+                id={`btn-role-switch-${actor.id}`}
+                onClick={() => handleActorClick(actor.id)}
+                className={`px-2.5 py-1 rounded-md font-medium text-xs transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                   isActive
-                    ? 'bg-amber-500 text-stone-950 font-bold shadow-sm'
+                    ? actor.isSystem
+                      ? 'bg-sky-500 text-stone-950 font-bold shadow-sm'
+                      : 'bg-amber-500 text-stone-950 font-bold shadow-sm'
                     : 'bg-stone-800/80 text-stone-400 hover:text-stone-200 hover:bg-stone-700'
                 }`}
-                title={`Alternar para visão de ${roleLabels[role].label}`}
+                title={`Alternar para visão de ${actor.label}`}
               >
-                {roleLabels[role].label}
+                {actor.id === 'tempo' && <Clock className="w-3 h-3" />}
+                {actor.id === 'notificacao' && <Mail className="w-3 h-3" />}
+                <span>{actor.label}</span>
               </button>
             );
           })}
@@ -104,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
                 resetAllData();
               }
             }}
-            className="ml-2 p-1 rounded text-stone-500 hover:text-stone-300"
+            className="ml-2 p-1 rounded text-stone-500 hover:text-stone-300 cursor-pointer"
             title="Resetar dados de demonstração"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -255,6 +285,35 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               </>
             )}
+
+            {/* Direct Actor Tabs */}
+            <button
+              id="tab-actor-tempo"
+              onClick={() => setActiveTab('ator-tempo')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === 'ator-tempo'
+                  ? 'bg-purple-500 text-stone-950 shadow font-bold'
+                  : 'text-stone-300 hover:text-stone-100 hover:bg-stone-800'
+              }`}
+              title="Acessar visão do Ator: Tempo (RF-23)"
+            >
+              <Timer className="w-3.5 h-3.5 text-purple-400" />
+              <span>Ator: Tempo</span>
+            </button>
+
+            <button
+              id="tab-actor-notificacao"
+              onClick={() => setActiveTab('ator-notificacao')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === 'ator-notificacao'
+                  ? 'bg-cyan-500 text-stone-950 shadow font-bold'
+                  : 'text-stone-300 hover:text-stone-100 hover:bg-stone-800'
+              }`}
+              title="Acessar visão do Ator: Serviço de E-mail/SMS (RF-24)"
+            >
+              <Mail className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Ator: E-mail/SMS</span>
+            </button>
 
             {/* Direct Login Screen Tab */}
             <button

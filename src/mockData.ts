@@ -1,71 +1,101 @@
-import { User, ServiceItem, BarberWorkingHours, Appointment, NotificationLog } from './types';
+import { User, ServiceItem, BarberWorkingHours, Appointment, NotificationLog, ToleranceAuditRecord } from './types';
 
 export const INITIAL_USERS: User[] = [
   {
     id: 'user-client-1',
+    login: 'carlos.eduardo',
     name: 'Carlos Eduardo Oliveira',
     email: 'carlos.eduardo@email.com',
     phone: '(11) 98765-4321',
     role: 'cliente',
     active: true,
+    password: 'Cliente@2026',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
   },
   {
     id: 'user-client-2',
+    login: 'mateus.souza',
     name: 'Mateus Henrique Souza',
     email: 'mateus.souza@email.com',
     phone: '(11) 98112-3344',
     role: 'cliente',
     active: true,
+    password: 'Cliente@2026',
     avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=200&q=80'
   },
   {
     id: 'user-rec-1',
+    login: 'juliana.recepcao',
     name: 'Juliana Mendes',
     email: 'juliana.recepcao@barbearia.com',
     phone: '(11) 97777-8888',
     role: 'recepcionista',
     active: true,
+    password: 'Recepcao@2026',
     avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=200&q=80'
   },
   {
     id: 'user-barber-1',
+    login: 'rodrigo.navalha',
     name: 'Rodrigo "Navalha" Silva',
     email: 'rodrigo.barbeiro@barbearia.com',
     phone: '(11) 99123-4567',
     role: 'barbeiro',
     active: true,
+    password: 'Barbeiro@2026',
     bio: 'Mestre navalheiro especialista em degradê e barboterapia há mais de 8 anos.',
+    serviceIds: ['serv-1', 'serv-2', 'serv-3', 'serv-4', 'serv-5'],
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80'
   },
   {
     id: 'user-barber-2',
+    login: 'marcos.vinicius',
     name: 'Marcos Vinicius Santos',
     email: 'marcos.barbeiro@barbearia.com',
     phone: '(11) 99234-5678',
     role: 'barbeiro',
     active: true,
+    password: 'Barbeiro@2026',
     bio: 'Especialista em cortes clássicos executivos, tesoura afiada e visagismo facial.',
+    serviceIds: ['serv-1', 'serv-2', 'serv-3', 'serv-4', 'serv-6'],
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80'
   },
   {
     id: 'user-barber-3',
+    login: 'lucas.pires',
     name: 'Lucas Pires',
     email: 'lucas.barbeiro@barbearia.com',
     phone: '(11) 99345-6789',
     role: 'barbeiro',
     active: true,
+    password: 'Barbeiro@2026',
     bio: 'Jovem talento em freestyle, desenhos geométricos e coloração de cabelo/barba.',
+    serviceIds: ['serv-1', 'serv-3', 'serv-4', 'serv-5', 'serv-6'],
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=200&q=80'
   },
   {
     id: 'user-admin-1',
+    login: 'admin',
     name: 'Fernando Costa (Proprietário)',
     email: 'admin@barbearia.com',
     phone: '(11) 99999-0000',
     role: 'administrador',
     active: true,
+    password: 'Admin@2026',
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80'
+  },
+  {
+    id: 'user-inactive-1',
+    login: 'andre.inativo',
+    name: 'André Soares (Inativo)',
+    email: 'andre.inativo@barbearia.com',
+    phone: '(11) 98888-0000',
+    role: 'barbeiro',
+    active: false, // Testa RF-02 e RF-08
+    password: 'Inativo@2026',
+    bio: 'Barbeiro com contrato temporariamente suspenso.',
+    serviceIds: ['serv-1'],
+    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=200&q=80'
   }
 ];
 
@@ -159,6 +189,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-101',
     clientId: 'user-client-1',
+    clientLogin: 'carlos.eduardo',
     clientName: 'Carlos Eduardo Oliveira',
     clientEmail: 'carlos.eduardo@email.com',
     clientPhone: '(11) 98765-4321',
@@ -168,12 +199,17 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     startTime: '09:30',
     endTime: '10:00',
     status: 'REALIZADO',
+    confirmedBy: 'Juliana Mendes',
+    confirmedAt: new Date(Date.now() - 7200000).toISOString(),
+    completedBy: 'Rodrigo "Navalha" Silva',
+    completedAt: new Date(Date.now() - 5400000).toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
     id: 'apt-102',
     clientId: 'user-client-2',
+    clientLogin: 'mateus.souza',
     clientName: 'Mateus Henrique Souza',
     clientEmail: 'mateus.souza@email.com',
     clientPhone: '(11) 98112-3344',
@@ -183,12 +219,15 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     startTime: '10:30',
     endTime: '11:30',
     status: 'CONFIRMADO',
+    confirmedBy: 'Juliana Mendes',
+    confirmedAt: new Date(Date.now() - 3600000).toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   },
   {
     id: 'apt-103',
     clientId: 'user-client-1',
+    clientLogin: 'carlos.eduardo',
     clientName: 'Carlos Eduardo Oliveira',
     clientEmail: 'carlos.eduardo@email.com',
     clientPhone: '(11) 98765-4321',
@@ -204,6 +243,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-104',
     clientId: 'user-client-2',
+    clientLogin: 'mateus.souza',
     clientName: 'Mateus Henrique Souza',
     clientEmail: 'mateus.souza@email.com',
     clientPhone: '(11) 98112-3344',
@@ -219,6 +259,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-105',
     clientId: 'user-client-1',
+    clientLogin: 'carlos.eduardo',
     clientName: 'Carlos Eduardo Oliveira',
     clientEmail: 'carlos.eduardo@email.com',
     clientPhone: '(11) 98765-4321',
@@ -234,6 +275,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
   {
     id: 'apt-106',
     clientId: 'user-client-1',
+    clientLogin: 'carlos.eduardo',
     clientName: 'Carlos Eduardo Oliveira',
     clientEmail: 'carlos.eduardo@email.com',
     clientPhone: '(11) 98765-4321',
@@ -246,12 +288,16 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     paymentMethod: 'PIX',
     paymentAmount: 90.0,
     paidAt: new Date(Date.now() - 86400000).toISOString(),
+    paidBy: 'Juliana Mendes',
+    confirmedBy: 'Juliana Mendes',
+    completedBy: 'Rodrigo "Navalha" Silva',
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     updatedAt: new Date(Date.now() - 86400000).toISOString()
   },
   {
     id: 'apt-107',
     clientId: 'user-client-2',
+    clientLogin: 'mateus.souza',
     clientName: 'Mateus Henrique Souza',
     clientEmail: 'mateus.souza@email.com',
     clientPhone: '(11) 98112-3344',
@@ -263,8 +309,30 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     status: 'CANCELADO',
     cancellationReason: 'Imprevisto no trabalho do cliente.',
     cancelledByRole: 'cliente',
+    cancelledBy: 'Mateus Henrique Souza',
+    cancelledAt: new Date(Date.now() - 172800000).toISOString(),
     createdAt: new Date(Date.now() - 172800000).toISOString(),
     updatedAt: new Date(Date.now() - 172800000).toISOString()
+  },
+  {
+    id: 'apt-108',
+    clientId: 'user-client-1',
+    clientLogin: 'carlos.eduardo',
+    clientName: 'Carlos Eduardo Oliveira',
+    clientEmail: 'carlos.eduardo@email.com',
+    clientPhone: '(11) 98765-4321',
+    barberId: 'user-barber-2',
+    serviceId: 'serv-2',
+    date: getRelativeDate(0),
+    startTime: '08:00',
+    endTime: '08:30',
+    status: 'CANCELADO',
+    cancellationReason: 'não comparecimento', // RF-23
+    cancelledByRole: 'tempo',
+    cancelledBy: 'Rotina de Tolerância (Ator Tempo)',
+    cancelledAt: new Date(Date.now() - 14400000).toISOString(),
+    createdAt: new Date(Date.now() - 18000000).toISOString(),
+    updatedAt: new Date(Date.now() - 14400000).toISOString()
   }
 ];
 
@@ -272,19 +340,61 @@ export const INITIAL_NOTIFICATIONS: NotificationLog[] = [
   {
     id: 'notif-1',
     type: 'CRIACAO',
-    channel: 'SMS',
-    recipient: '(11) 98765-4321',
-    title: 'Agendamento Confirmado',
-    message: 'Olá Carlos! Seu agendamento para Corte Tradicional no dia de hoje às 09:30 com Rodrigo Navalha foi confirmado com sucesso.',
-    timestamp: new Date(Date.now() - 7200000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    channel: 'EMAIL',
+    recipient: 'carlos.eduardo@email.com',
+    title: 'Agendamento Criado com Sucesso',
+    message: 'Olá Carlos Eduardo! Seu agendamento para Corte Tradicional no dia de hoje às 09:30 com Rodrigo Navalha foi criado com sucesso (Status: AGENDADO).',
+    timestamp: new Date(Date.now() - 7200000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    status: 'ENVIADO',
+    appointmentId: 'apt-101'
   },
   {
     id: 'notif-2',
-    type: 'LEMBRETE',
+    type: 'TOLERANCIA_EXPIRADA',
     channel: 'EMAIL',
     recipient: 'carlos.eduardo@email.com',
-    title: 'Lembrete de Atendimento',
-    message: 'Seu corte está chegando hoje às 14:00. Caso precise reagendar ou cancelar, use nosso aplicativo com antecedência.',
-    timestamp: new Date(Date.now() - 3600000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    title: 'Agendamento Cancelado por Não Comparecimento',
+    message: 'Seu agendamento das 08:00 expirou o período de tolerância de 15 minutos sem registro de presença. Conforme a política de atendimento, o horário foi cancelado por não comparecimento.',
+    timestamp: new Date(Date.now() - 14400000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    status: 'ENVIADO',
+    appointmentId: 'apt-108'
+  },
+  {
+    id: 'notif-3',
+    type: 'CRIACAO',
+    channel: 'SMS',
+    recipient: '(11) 98112-3344',
+    title: 'Agendamento Criado',
+    message: 'Mateus, seu agendamento para Barba Completa foi confirmado para hoje às 10:30 com Rodrigo Navalha. Tolerância de 15min.',
+    timestamp: new Date(Date.now() - 3600000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    status: 'ENVIADO',
+    appointmentId: 'apt-102'
+  }
+];
+
+export const INITIAL_TOLERANCE_AUDIT: ToleranceAuditRecord[] = [
+  {
+    id: 'tol-001',
+    appointmentId: 'apt-108',
+    clientName: 'Carlos Eduardo Oliveira',
+    serviceName: 'Barba Completa & Toalha Quente',
+    barberName: 'Marcos Vinicius Santos',
+    scheduledTime: '08:00',
+    evaluatedAt: '08:16:02',
+    minutesOverdue: 16,
+    action: 'CANCELADO_POR_TOLERANCIA',
+    details: 'Status era AGENDADO. Sem confirmação de presença pela recepção após 15 minutos do horário de início. Cancelado por "não comparecimento" e notificação enviada (RF-23).'
+  },
+  {
+    id: 'tol-002',
+    appointmentId: 'apt-101',
+    clientName: 'Carlos Eduardo Oliveira',
+    serviceName: 'Corte Tradicional Masculino',
+    barberName: 'Rodrigo "Navalha" Silva',
+    scheduledTime: '09:30',
+    evaluatedAt: '09:47:00',
+    minutesOverdue: 17,
+    action: 'IGNORADO_PRESENCA_CONFIRMADA',
+    details: 'Presença já havia sido confirmada pela recepção (status CONFIRMADO). Não sofre ação da rotina de tolerância (Critério RF-20/RF-23).'
   }
 ];

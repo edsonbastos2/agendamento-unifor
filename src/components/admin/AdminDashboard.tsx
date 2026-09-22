@@ -47,6 +47,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
 
   // New Barber Modal (RF-06)
   const [showBarberModal, setShowBarberModal] = useState(false);
+  const [barberLogin, setBarberLogin] = useState('');
   const [barberName, setBarberName] = useState('');
   const [barberEmail, setBarberEmail] = useState('');
   const [barberPhone, setBarberPhone] = useState('');
@@ -56,6 +57,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
 
   // New Receptionist Modal (RF-07)
   const [showRecModal, setShowRecModal] = useState(false);
+  const [recLogin, setRecLogin] = useState('');
   const [recName, setRecName] = useState('');
   const [recEmail, setRecEmail] = useState('');
   const [recPhone, setRecPhone] = useState('');
@@ -96,7 +98,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
   // Handle Barber Creation (RF-06)
   const handleCreateBarber = (e: React.FormEvent) => {
     e.preventDefault();
+    const effectiveLogin = (barberLogin || barberEmail.split('@')[0] || barberName.toLowerCase().replace(/\s+/g, '.')).trim().toLowerCase();
     const res = addBarber({
+      login: effectiveLogin,
       name: barberName,
       email: barberEmail,
       phone: barberPhone,
@@ -106,18 +110,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
 
     if (res.success) {
       setBarberSuccessLink(res.firstAccessLink);
+      setBarberLogin('');
       setBarberName('');
       setBarberEmail('');
       setBarberPhone('');
       setBarberBio('');
       setBarberSelectedServices([]);
+    } else {
+      setFeedback(res.message);
     }
   };
 
   // Handle Receptionist Creation (RF-07)
   const handleCreateReceptionist = (e: React.FormEvent) => {
     e.preventDefault();
+    const effectiveLogin = (recLogin || recEmail.split('@')[0] || recName.toLowerCase().replace(/\s+/g, '.')).trim().toLowerCase();
     const res = addReceptionist({
+      login: effectiveLogin,
       name: recName,
       email: recEmail,
       phone: recPhone
@@ -125,9 +134,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ activeSubTab }) 
 
     if (res.success) {
       setRecSuccessLink(res.firstAccessLink);
+      setRecLogin('');
       setRecName('');
       setRecEmail('');
       setRecPhone('');
+    } else {
+      setFeedback(res.message);
     }
   };
 

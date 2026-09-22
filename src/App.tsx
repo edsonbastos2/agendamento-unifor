@@ -10,6 +10,8 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { AuthModal } from './components/auth/AuthModal';
 import { LoginView } from './components/auth/LoginView';
 import { NotificationDrawer } from './components/notifications/NotificationDrawer';
+import { SystemTimeActorView } from './components/system/SystemTimeActorView';
+import { MessagingServiceActorView } from './components/system/MessagingServiceActorView';
 import { UserRole } from './types';
 
 function MainApp() {
@@ -20,9 +22,9 @@ function MainApp() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showBatchCancelModal, setShowBatchCancelModal] = useState(false);
 
-  // Sync tab with user role if mismatch occurs, except when deliberately on the login screen
+  // Sync tab with user role if mismatch occurs, except when deliberately on special screens
   useEffect(() => {
-    if (activeTab === 'login') return;
+    if (activeTab === 'login' || activeTab === 'ator-tempo' || activeTab === 'ator-notificacao') return;
 
     if (currentUser.role === 'cliente') {
       if (!['agendar', 'meus-agendamentos'].includes(activeTab)) {
@@ -77,8 +79,12 @@ function MainApp() {
           />
         )}
 
+        {/* SYSTEM ACTOR VIEWS (RF-23 & RF-24) */}
+        {activeTab === 'ator-tempo' && <SystemTimeActorView />}
+        {activeTab === 'ator-notificacao' && <MessagingServiceActorView />}
+
         {/* CLIENT ROLE VIEWS */}
-        {activeTab !== 'login' && currentUser.role === 'cliente' && (
+        {activeTab !== 'login' && activeTab !== 'ator-tempo' && activeTab !== 'ator-notificacao' && currentUser.role === 'cliente' && (
           <>
             {activeTab === 'agendar' && (
               <BookingWizard
@@ -92,7 +98,7 @@ function MainApp() {
         )}
 
         {/* RECEPTIONIST ROLE VIEWS */}
-        {activeTab !== 'login' && currentUser.role === 'recepcionista' && (
+        {activeTab !== 'login' && activeTab !== 'ator-tempo' && activeTab !== 'ator-notificacao' && currentUser.role === 'recepcionista' && (
           <>
             {(activeTab === 'recepcao' || activeTab === 'recepcao-lote') && (
               <ReceptionDashboard
@@ -122,12 +128,12 @@ function MainApp() {
         )}
 
         {/* BARBER ROLE VIEWS */}
-        {activeTab !== 'login' && currentUser.role === 'barbeiro' && (
+        {activeTab !== 'login' && activeTab !== 'ator-tempo' && activeTab !== 'ator-notificacao' && currentUser.role === 'barbeiro' && (
           <BarberScheduleView />
         )}
 
         {/* ADMINISTRATOR ROLE VIEWS */}
-        {activeTab !== 'login' && currentUser.role === 'administrador' && (
+        {activeTab !== 'login' && activeTab !== 'ator-tempo' && activeTab !== 'ator-notificacao' && currentUser.role === 'administrador' && (
           <AdminDashboard
             activeSubTab={
               activeTab === 'admin-barbeiros'

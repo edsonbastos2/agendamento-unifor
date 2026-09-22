@@ -38,7 +38,6 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
     finishService,
     registerPayment,
     cancelAppointment,
-    markNoShow,
     rescheduleAppointment,
     getAvailableSlots,
     runToleranceCheck
@@ -89,7 +88,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
   const countConfirmado = dayApts.filter((a) => a.status === 'CONFIRMADO').length;
   const countRealizado = dayApts.filter((a) => a.status === 'REALIZADO').length;
   const countPago = dayApts.filter((a) => a.status === 'PAGO').length;
-  const countCancelado = dayApts.filter((a) => a.status === 'CANCELADO' || a.status === 'NAO_COMPARECEU').length;
+  const countCancelado = dayApts.filter((a) => a.status === 'CANCELADO').length;
 
   const handleOpenPayment = (apt: Appointment) => {
     const s = services.find((srv) => srv.id === apt.serviceId);
@@ -142,8 +141,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
     CONFIRMADO: { label: 'Presença Confirmada', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
     REALIZADO: { label: 'Realizado (Aguardando Pagamento)', badge: 'bg-sky-500/10 text-sky-400 border-sky-500/30' },
     PAGO: { label: 'Pago', badge: 'bg-teal-500/10 text-teal-400 border-teal-500/30' },
-    CANCELADO: { label: 'Cancelado', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/30' },
-    NAO_COMPARECEU: { label: 'Não Compareceu', badge: 'bg-stone-800 text-stone-400 border-stone-700' }
+    CANCELADO: { label: 'Cancelado', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/30' }
   };
 
   return (
@@ -382,7 +380,7 @@ export const ReceptionDashboard: React.FC<ReceptionDashboardProps> = ({
                   {apt.status === 'AGENDADO' && (
                     <button
                       id={`btn-mark-no-show-${apt.id}`}
-                      onClick={() => markNoShow(apt.id)}
+                      onClick={() => cancelAppointment(apt.id, 'não comparecimento', 'recepcionista')}
                       className="px-2.5 py-1.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-stone-200 text-xs font-medium transition-all"
                       title="Cliente não compareceu após tolerância"
                     >

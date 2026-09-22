@@ -89,12 +89,6 @@ export const MyBookings: React.FC<MyBookingsProps> = ({ onNewBookingClick }) => 
       bg: 'bg-rose-500/10',
       text: 'text-rose-400',
       border: 'border-rose-500/30'
-    },
-    NAO_COMPARECEU: {
-      label: 'Não Compareceu',
-      bg: 'bg-stone-800',
-      text: 'text-stone-400',
-      border: 'border-stone-700'
     }
   };
 
